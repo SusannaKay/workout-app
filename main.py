@@ -1,5 +1,7 @@
-from keys import API_KEY,APP_ID
+from keys import *
 import requests
+from datetime import datetime 
+import json
 
 # exercise stats for plain text input from nutrix 
 
@@ -13,12 +15,46 @@ headers =  {
   }
 
 parameters = {
-    'query': QUERY
+    'query': QUERY,
+    'gender': 'female',
+    'weight_kg': 81,
+    'height_cm': 175,
+    'age': 39
 }
 
 response = requests.post(url=NUTRI_ENDPOINT,headers=headers,json=parameters)
 response.raise_for_status
 
-data = response.json()
-print(data)
+result = response.json()
 
+
+
+
+SHEETY_ENDPOINT = f'https://api.sheety.co/{username}/{projectName}/{sheetName}'
+
+# date , time, exercise, duration, calories
+
+
+
+today_date = datetime.now().strftime("%d/%m/%Y")
+now_time = datetime.now().strftime("%X")
+
+for exercise in result["exercises"]:
+    sheet_inputs = {
+        "workout": {
+            "date": today_date,
+            "time": now_time,
+            "exercise": exercise["name"].title(),
+            "duration": exercise["duration_min"],
+            "calories": exercise["nf_calories"]
+        }
+    }
+
+
+
+    sheety_header = {
+        'Content-Type': 'application/json'
+    }
+
+    sheety_response = requests.post(url=SHEETY_ENDPOINT, json=sheet_inputs)
+    print(sheety_response.text)

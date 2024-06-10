@@ -1,9 +1,18 @@
-from keys import *
+from dotenv import load_dotenv
+import os
 import requests
 from datetime import datetime 
 import json
 
-# exercise stats for plain text input from nutrix 
+
+load_dotenv(f"{os.getcwd()}/.env")
+APP_ID = os.environ.get('APP_ID')
+API_KEY =os.environ.get('API_KEY')
+username = os.environ.get('username')
+projectName = os.environ.get('projectName')
+sheetName = os.environ.get('sheetName')
+bearer = os.environ.get('bearer')
+
 
 NUTRI_ENDPOINT = 'https://trackapi.nutritionix.com/v2/natural/exercise'
 QUERY = input("What did you do today? ")
@@ -53,8 +62,9 @@ for exercise in result["exercises"]:
 
 
     sheety_header = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': bearer
     }
 
-    sheety_response = requests.post(url=SHEETY_ENDPOINT, json=sheet_inputs)
+    sheety_response = requests.post(url=SHEETY_ENDPOINT, json=sheet_inputs, headers=sheety_header)
     print(sheety_response.text)
